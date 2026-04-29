@@ -13,7 +13,7 @@ export default function Home() {
       <header className="flex items-start justify-between gap-4">
         <div>
           <div className="text-xs uppercase tracking-[0.25em] text-zinc-500">
-            Meeting Analyst
+            Meet Your TIme
           </div>
           <h1 className="mt-1 text-3xl font-semibold text-zinc-100">
             Should this meeting exist?

@@ -1,4 +1,4 @@
-# Meeting Analyst
+# Meet Your TIme
 
 Paste a meeting invite → get the real "job" it's hired to do, a verdict (🔴 REPLACE / 🟡 FIX / ✅ KEEP), an async replacement or tightened invite, and a person-hours cost counter.
 

@@ -16,7 +16,7 @@ const display = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Meeting Analyst — Should this meeting exist?",
+  title: "Meet Your TIme — Should this meeting exist?",
   description:
     "Paste a meeting invite. Get the real job it's hired to do, a verdict, and an async replacement.",
 };

@@ -17,7 +17,7 @@ export default async function MeetingsPage() {
             href="/"
             className="text-xs uppercase tracking-[0.25em] text-zinc-500 hover:text-zinc-300"
           >
-            ← Meeting Analyst
+            ← Meet Your TIme
           </Link>
           <h1 className="mt-2 text-3xl font-semibold text-zinc-100">
             Your next 7 days
