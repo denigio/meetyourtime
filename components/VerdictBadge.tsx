@@ -18,8 +18,21 @@ const STYLES: Record<Verdict, { label: string; emoji: string; cls: string }> = {
   },
 };
 
-export function VerdictBadge({ verdict }: { verdict: Verdict | null }) {
+export function VerdictBadge({
+  verdict,
+  done,
+}: {
+  verdict: Verdict | null;
+  done?: boolean;
+}) {
   if (!verdict) {
+    if (done) {
+      return (
+        <span className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-wider text-zinc-400">
+          Analyzed
+        </span>
+      );
+    }
     return (
       <span className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-wider text-zinc-400">
         <span className="h-2 w-2 animate-pulse rounded-full bg-zinc-500" />
@@ -39,10 +52,18 @@ export function VerdictBadge({ verdict }: { verdict: Verdict | null }) {
 }
 
 export function parseVerdict(text: string): Verdict | null {
-  const m = text.match(/\*\*Verdict:\*\*\s*([🔴🟡✅])/);
-  if (!m) return null;
-  if (m[1] === "🔴") return "REPLACE";
-  if (m[1] === "🟡") return "FIX";
-  if (m[1] === "✅") return "KEEP";
+  // Find the verdict line; tolerate `**Verdict:**`, `**Verdict**:`, `Verdict:`.
+  const lineMatch = text.match(/^[ \t]*\*{0,2}Verdict\*{0,2}\s*:\s*(.+)$/im);
+  if (!lineMatch) return null;
+  const line = lineMatch[1];
+
+  if (line.includes("🔴")) return "REPLACE";
+  if (line.includes("🟡")) return "FIX";
+  if (line.includes("✅")) return "KEEP";
+
+  const upper = line.toUpperCase();
+  if (upper.includes("REPLACE")) return "REPLACE";
+  if (upper.includes("FIX")) return "FIX";
+  if (upper.includes("KEEP")) return "KEEP";
   return null;
 }

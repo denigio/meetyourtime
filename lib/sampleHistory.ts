@@ -397,4 +397,4 @@ export const SAMPLE_HISTORY: CalendarEvent[] = SEEDS.map((s, i) =>
   buildEvent(s, i),
 );
 
-export const SAMPLE_TEAM_NAME = "Helix · Product team";
+export const SAMPLE_TEAM_NAME = "Mind The Hackathon · Product team";
