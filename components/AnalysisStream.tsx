@@ -1,10 +1,59 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Check, Copy } from "lucide-react";
 import { VerdictBadge, parseVerdict } from "./VerdictBadge";
 import { CostCounter } from "./CostCounter";
+
+function nodeToText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeToText).join("");
+  if (React.isValidElement(node))
+    return nodeToText((node.props as { children?: React.ReactNode }).children);
+  return "";
+}
+
+function CodeBlock({ children }: { children?: React.ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const codeText = nodeToText(children).replace(/\n+$/, "");
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <div className="relative my-3">
+      <pre style={{ paddingRight: "4.25rem" }}>{children}</pre>
+      <button
+        onClick={onCopy}
+        aria-label={copied ? "Copied" : "Copy code"}
+        className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border border-zinc-700/70 bg-zinc-900/80 px-2 py-1 text-[11px] font-medium text-zinc-300 backdrop-blur-sm transition-colors hover:border-zinc-600 hover:bg-zinc-800 hover:text-zinc-100"
+      >
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-emerald-400" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" />
+        )}
+        <span>{copied ? "Copied" : "Copy"}</span>
+      </button>
+    </div>
+  );
+}
+
+const MARKDOWN_COMPONENTS: Components = {
+  pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+};
 
 interface Props {
   invite: string;
@@ -63,6 +112,8 @@ export function AnalysisStream({ invite, images, onReset }: Props) {
   const verdict = parseVerdict(text);
   const { before, artifact, after } = splitArtifact(text);
   const sendable = artifact ? extractSendable(artifact) : null;
+  const bodyText = stripCost(text);
+  const afterBody = stripCost(after);
 
   const copy = async (value: string, kind: "result" | "artifact") => {
     try {
@@ -103,7 +154,10 @@ export function AnalysisStream({ invite, images, onReset }: Props) {
         >
           {artifact ? (
             <>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={MARKDOWN_COMPONENTS}
+              >
                 {before}
               </ReactMarkdown>
               <div className="not-prose relative my-4 overflow-hidden rounded-lg border border-emerald-900/40 border-l-4 border-l-emerald-500/70 bg-emerald-950/10">
@@ -119,20 +173,29 @@ export function AnalysisStream({ invite, images, onReset }: Props) {
                   </button>
                 </div>
                 <div className="prose-analysis px-5 py-4 text-zinc-200">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={MARKDOWN_COMPONENTS}
+                  >
                     {artifact}
                   </ReactMarkdown>
                 </div>
               </div>
-              {after && (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {after}
+              {afterBody && (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={MARKDOWN_COMPONENTS}
+                >
+                  {afterBody}
                 </ReactMarkdown>
               )}
             </>
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {text || "_Thinking…_"}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={MARKDOWN_COMPONENTS}
+            >
+              {bodyText || "_Thinking…_"}
             </ReactMarkdown>
           )}
         </div>
@@ -170,6 +233,10 @@ function splitArtifact(text: string): {
     artifact: rawArtifact,
     after: text.slice(sectionEnd).replace(/^\n+/, ""),
   };
+}
+
+function stripCost(text: string): string {
+  return text.replace(/\n*\*\*Cost:\*\*[^\n]*\n*/g, "\n").trim();
 }
 
 function extractSendable(artifact: string): string {
