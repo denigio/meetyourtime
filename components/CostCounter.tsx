@@ -24,26 +24,26 @@ export function CostCounter({ text }: { text: string }) {
   if (perMeeting === null) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+    <div className="grid grid-cols-2 gap-3 rounded-xl border border-amber-900/40 border-l-4 border-l-amber-500/70 bg-amber-950/10 p-4">
       <div>
-        <div className="text-[10px] uppercase tracking-widest text-zinc-500">
+        <div className="text-[10px] uppercase tracking-widest text-amber-300/80">
           This meeting
         </div>
-        <div className="mt-1 text-2xl font-semibold text-zinc-100 tabular-nums">
+        <div className="mt-1 text-2xl font-semibold text-amber-100 tabular-nums">
           {perMeeting}
-          <span className="ml-1 text-sm font-normal text-zinc-500">
+          <span className="ml-1 text-sm font-normal text-amber-300/60">
             person-hours
           </span>
         </div>
       </div>
       <div>
-        <div className="text-[10px] uppercase tracking-widest text-zinc-500">
+        <div className="text-[10px] uppercase tracking-widest text-amber-300/80">
           If recurring
         </div>
-        <div className="mt-1 text-2xl font-semibold text-zinc-100 tabular-nums">
+        <div className="mt-1 text-2xl font-semibold text-amber-100 tabular-nums">
           {oneOff || monthly === null ? "—" : monthly}
           {!oneOff && monthly !== null && (
-            <span className="ml-1 text-sm font-normal text-zinc-500">
+            <span className="ml-1 text-sm font-normal text-amber-300/60">
               person-hours/month
             </span>
           )}
